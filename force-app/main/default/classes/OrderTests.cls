@@ -7,31 +7,47 @@
 **/
 @isTest
 private class OrderTests {
-
-    @TestSetup
-    static void SetupTestData(){
-        TestDataFactory.InsertTestData(5);
+    
+	@testSetup
+    static void SetupTestData() {
+        TestDataFactory.InsertTestData(20);
     }
     
-    @IsTest
-    static void OrderUpdate_UnitTest(){
+    @isTest
+    static void OrderUpdate_UnitTest() {
+    	Order selectedOrder = [Select name,Status, Id from Order limit 1];
+        Product2 oldProd = [Select Quantity_Ordered__c, Name, Id from Product2 limit 1];
         
-        Test.startTest();
-        List<Product2> befores = [SELECT Id,Quantity_Ordered__c FROM Product2];
-
-        List<Order> ords = [SELECT Id FROM Order];
-        for(Order o : ords){
-            o.Status = Constants.ACTIVATED_ORDER_STATUS;
-        }
-        UPDATE ords;
+        selectedOrder.Status = Constants.ACTIVATED_ORDER_STATUS;
+        update selectedOrder;
         
-        List<Product2> afters = [SELECT Id,Quantity_Ordered__c FROM Product2];
+        Product2 updatedProd = [Select Quantity_Ordered__c, Name, Id from Product2 limit 1];
         
-        for(integer i =0; i<befores.size();i++){
-            TestDataFactory.VerifyQuantityOrdered( befores.get(i), afters.get(i), Constants.DEFAULT_ROWS);
-        }
-
-        Test.stopTest();
-        
+        TestDataFactory.VerifyQuantityOrdered(oldProd,updatedProd,Constants.DEFAULT_ROWS);
     }
+    
+    @isTest
+    static void OrderExtension_UnitTest() {
+        PageReference reference = Page.OrderEdit;
+        Test.setCurrentPage(reference);
+        Order CurOrder = [Select Id,Status from Order limit 1];
+        ApexPages.StandardController controller = new Apexpages.StandardController(CurOrder);
+        OrderExtension extension = new OrderExtension(controller);
+        System.assertEquals(5, extension.orderItemList.size());
+        extension.selectedFamily = 'Dessert';
+        extension.SelectFamily();
+        extension.OnFieldChange();
+        extension.First();
+        extension.Next();
+        extension.Previous();
+        extension.Last();
+        extension.GetHasNext();
+        extension.GetPageNumber();
+        extension.GetHasPrevious();
+        extension.GetTotalPages();
+        extension.GetFamilyOptions();
+        extension.Save();
+        ChartHelper.GetInventory();
+    } 
+
 }

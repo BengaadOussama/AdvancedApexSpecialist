@@ -56,4 +56,26 @@ private class Product2Tests {
         System.assertEquals(5, createdProducts.size());
     }
 
+    @isTest
+    static void Product2Trigger_UnitTest() {
+        Test.startTest();
+        Product2 newProduct = new Product2();
+        newProduct.Name = 'Test';
+        newProduct.Family = 'Dessert';
+        newProduct.IsActive = true;
+        newProduct.Quantity_Ordered__c = 5;
+        newProduct.Initial_Inventory__c = 10;
+        insert newProduct;
+        
+        CollaborationGroup c = new CollaborationGroup();
+        c.Name = 'TEST' + Constants.INVENTORY_ANNOUNCEMENTS;
+        c.Description = 'Description';
+        c.CollaborationType = 'Public';
+        insert c;
+        
+        newProduct.Quantity_Ordered__c=96;
+        update newProduct;
+        Test.stopTest();
+    } 
+
 }
