@@ -156,4 +156,7 @@ public with sharing class TestDataFactory {
 
     }
 
+    public static void VerifyQuantityOrdered(Product2 originalProduct, Product2 updatedProduct, Integer qtyOrdered){
+        System.assertEquals(updatedProduct.Quantity_Ordered__c, originalProduct.Quantity_Ordered__c + qtyOrdered);
+    }
 }
